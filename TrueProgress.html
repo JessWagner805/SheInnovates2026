@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fake Progress Detector</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            padding: 40px;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 700px;
+            margin: auto;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .risk {
+            font-size: 20px;
+            font-weight: bold;
+            color: #d9534f;
+        }
+        pre {
+            background: #eee;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>🚨 Fake Progress Detection</h2>
+
+    <p><strong>Issue:</strong> {{ issue.issue_key }} — {{ issue.summary }}</p>
+
+    <div class="risk">
+        {{ analysis }}
+    </div>
+
+    <h3>Raw Jira Data</h3>
+    <pre>{{ issue }}</pre>
+</div>
+
+</body>
+</html>
