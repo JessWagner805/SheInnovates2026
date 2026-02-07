@@ -11,7 +11,7 @@
 
 
 ## PNC Challenge Statement
-We challenge you to design an AI-powered productivity solution for Product Managers
+*We challenge you to design an AI-powered productivity solution for Product Managers*
 
 ## Problem
 
