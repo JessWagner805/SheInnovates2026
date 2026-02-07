@@ -1,10 +1,13 @@
 import requests
 import json
-import os
+from dotenv import load_dotenv
+import os 
 
+load_dotenv()
 
-API_URL = "https://www.huggingfaceapi.com/api/llm"
 API_KEY = os.getenv("HF_API_KEY")
+API_URL = "https://www.huggingfaceapi.com/api/llm"
+
 
 def analyze_issue(issue):
     
@@ -37,8 +40,17 @@ Issue Data:
 
     result = response.json()
 
+    print("RAW API RESPONSE:", result)  # temporary debug
+
+    output_text = result.get("text") or result.get("generated_text")
+
     try:
-        parsed = json.loads(result["text"])
+        parsed = json.loads(output_text)
         return parsed
     except:
-        return {"error": "Failed to parse LLM response"}
+        return {
+            "fake_progress": False,
+            "risk_score": 0,
+            "explanation": "LLM response could not be parsed."
+        }
+

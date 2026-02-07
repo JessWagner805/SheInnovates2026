@@ -36,9 +36,15 @@
     <p><strong>Issue:</strong> {{ issue.issue_key }} — {{ issue.summary }}</p>
 
     <div class="risk">
-        {{ analysis }}
+        {% if analysis.fake_progress %}
+            ⚠ HIGH RISK (Score: {{ analysis.risk_score }})
+        {% else %}
+            ✅ LOW RISK (Score: {{ analysis.risk_score }})
+        {% endif %}
     </div>
-
+    
+    <p><strong>Explanation:</strong> {{ analysis.explanation }}</p>
+    
     <h3>Raw Jira Data</h3>
     <pre>{{ issue }}</pre>
 </div>

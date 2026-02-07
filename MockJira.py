@@ -1,4 +1,5 @@
-jira_issue = {
+def jira_issue():
+    return {
     "issue_key": "PM-214",
     "status_history": [
         ("To Do", "2024-03-01"),
