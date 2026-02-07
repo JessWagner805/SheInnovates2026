@@ -1,4 +1,5 @@
 # SheInnovates2026
+*By: Pearl Singer and Jess Wagner*
 
 ### Table of Contents
 - [PNC Challenge Statement](#PNC-Challenge-Statement)
