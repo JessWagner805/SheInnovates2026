@@ -25,6 +25,22 @@
             background: #eee;
             padding: 10px;
             border-radius: 5px;
+            overflow-x: auto;
+        }
+        details {
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        summary {
+            font-weight: bold;
+            font-size: 18px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            user-select: none;
+        }
+        summary:hover {
+            background: #e0e0e0;
         }
     </style>
 </head>
@@ -45,8 +61,10 @@
     
     <p><strong>Explanation:</strong> {{ analysis.explanation }}</p>
     
-    <h3>Raw Jira Data</h3>
-    <pre>{{ issue }}</pre>
+    <details>
+        <summary>📋 Raw Jira Data (click to expand)</summary>
+        <pre>{{ issue }}</pre>
+    </details>
 </div>
 
 </body>
