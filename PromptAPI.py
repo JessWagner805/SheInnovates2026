@@ -4,6 +4,7 @@ import json
 API_URL = "https://www.huggingfaceapi.com/api/llm"
 API_KEY = "YOUR_HF_API_KEY"  # put your key here
 
+# prompt for the AI model to analyze Jira issue data for signs of fake progress
 prompt = f"""
 You are an AI assistant helping product managers detect fake progress in Jira.
 
@@ -21,6 +22,7 @@ Risk Score: <number>
 Explanation: <short explanation>
 """
 
+# Send the prompt to the Hugging Face API
 response = requests.post(
     API_URL,
     headers={
