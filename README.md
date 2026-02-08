@@ -42,7 +42,6 @@ Rather than replacing Jira or changing existing workflows, the system acts as an
 
 ## How it works
 **MockJira.py** simulates Jira issue data. **app.py** retrieves this data and sends each issue to **PromptAPI.py**, which uses the FLAN-T5 Base LLM to analyze the issue and compute a fake-progress risk score. **app.py** then combines the raw issue data with the analysis results and serves them to **index.html**, which formats and displays the information on a local web page at [http://localhost:5000/](http://localhost:5000/) when the server is running.
-<img width="1918" height="1018" alt="ScreenShotOfficial" src="https://github.com/user-attachments/assets/36579cd2-d923-4259-8849-7d3ac5ca2a77" />
 
 
 ## Outcome
@@ -54,6 +53,8 @@ Product managers gain:
 
 
 ## Photos
+<img width="1918" height="1018" alt="ScreenShotOfficial" src="https://github.com/user-attachments/assets/36579cd2-d923-4259-8849-7d3ac5ca2a77" />
+<img width="1918" height="1017" alt="ScreenshotDropDown" src="https://github.com/user-attachments/assets/984b0d1c-0557-4dd3-ba3e-e4008386442a" />
 
 
 ## Devpost Submission
