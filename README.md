@@ -15,6 +15,16 @@
 *We challenge you to design an AI-powered productivity solution for Product Managers*
 
 ## Problem
+Product managers rely on tools like Jira to track progress, but task activity does not always reflect real progress. Product managers are forced to trust that updates accurately represent work being completed, even when timelines and deadlines are at risk.
+
+This creates opportunities for “fake progress,” such as:
+* Tasks being marked Done and later reopened
+* Excessive status changes without completion
+* Creating and deleting tasks without any meaningful output
+* Consistently overestimating or underestimating story points
+* Prolonged time spent In Progress with little forward movement
+
+As a result, PMs often discover problems too late, when deadlines are already missed and recovery options are limited.
 
 ## Solution
 
