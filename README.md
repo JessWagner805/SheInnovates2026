@@ -25,3 +25,11 @@
 ## Video Demonstration
 
 ## Devpost Submission
+
+
+
+
+##Things you will need to install for this to work
+pip install transformers torch flask python-dotenv
+pip install -U sentence-transformers      
+pip install flask requests python-dotenv
