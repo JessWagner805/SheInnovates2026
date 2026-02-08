@@ -63,7 +63,19 @@
     
     <details>
         <summary>📋 Raw Jira Data (click to expand)</summary>
-        <pre>{{ issue }}</pre>
+        <table style="width:100%; border-collapse: collapse;">
+            {% for key, value in issue.items() %}
+            <tr>
+                <td style="font-weight:bold; padding:6px; border-bottom:1px solid #ddd;">
+                    {{ key.replace('_', ' ').title() }}
+                </td>
+                <td style="padding:6px; border-bottom:1px solid #ddd;">
+                    {{ value }}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
     </details>
 </div>
 
