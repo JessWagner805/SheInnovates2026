@@ -1,4 +1,4 @@
-# SheInnovates2026
+# Jira Progress Auditor
 *By: Pearl Singer and Jess Wagner*
 
 ### Table of Contents
