@@ -35,8 +35,8 @@ The program directly addresses the problem by:
 * Comparing actual time in progress to team averages to flag tasks that linger without completion
 * Analyzing Jira status histories to detect excessive reopenings, transitions, and stalled work
 * Evaluating engagement with tasks such as comment volume
-* Scoring each issue for fake progress risk (0–100) using an LLM-driven assessment
-* Generating a clear explanation that helps Product Managers understand why an issue is risky
+* Scoring each issue for fake progress risk (0–100)
+* Using an LLM to generate a clear explanation that helps Product Managers understand why an issue is risky
 
 Rather than replacing Jira or changing existing workflows, the system acts as an auditing layer that highlights issues needing attention. Product Managers can quickly identify problematic tasks, investigate earlier, and take corrective action before deadlines are missed.
 
