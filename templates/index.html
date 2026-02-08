@@ -1,82 +1,159 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Fake Progress Detector</title>
+
     <style>
         body {
             font-family: Arial, sans-serif;
             background: #f4f6f8;
             padding: 40px;
         }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 24px;
+        }
+
         .card {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 700px;
-            margin: auto;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            padding: 22px;
+            border-radius: 14px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 22px rgba(0,0,0,0.12);
+        }
+
         .risk {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .risk.high {
             color: #d9534f;
         }
-        pre {
-            background: #eee;
-            padding: 10px;
-            border-radius: 5px;
-            overflow-x: auto;
+
+        .risk.low {
+            color: #2e8b57;
         }
+
         details {
-            margin-top: 20px;
-            cursor: pointer;
+            margin-top: 16px;
         }
+
         summary {
             font-weight: bold;
-            font-size: 18px;
+            font-size: 16px;
             padding: 10px;
-            background: #f0f0f0;
-            border-radius: 5px;
+            background: #f1f3f5;
+            border-radius: 8px;
+            cursor: pointer;
             user-select: none;
         }
+
         summary:hover {
-            background: #e0e0e0;
+            background: #e6e8eb;
+        }
+
+        .jira-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            font-size: 14px;
+        }
+
+        .jira-table td {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+
+        .jira-table td.label {
+            font-weight: bold;
+            color: #555;
+            width: 40%;
+        }
+
+        .status-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        .status-list li {
+            padding: 4px 0;
         }
     </style>
 </head>
+
 <body>
 
-<div class="card">
-    <h2>🚨 Fake Progress Detection</h2>
+<h1>🚨 Fake Progress Detection</h1>
 
-    <p><strong>Issue:</strong> {{ issue.issue_key }} — {{ issue.summary }}</p>
+<div class="grid">
+{% for item in items %}
+    <div class="card">
+        <h3>📌 {{ item.issue.issue_key }}</h3>
 
-    <div class="risk">
-        {% if analysis.fake_progress %}
-            ⚠ HIGH RISK (Score: {{ analysis.risk_score }})
-        {% else %}
-            ✅ LOW RISK (Score: {{ analysis.risk_score }})
-        {% endif %}
+        <div class="risk {% if item.analysis.fake_progress %}high{% else %}low{% endif %}">
+            {% if item.analysis.fake_progress %}
+                ⚠ High Risk (Score: {{ item.analysis.risk_score }})
+            {% else %}
+                ✅ Low Risk (Score: {{ item.analysis.risk_score }})
+            {% endif %}
+        </div>
+
+        <p><strong>Explanation:</strong> {{ item.analysis.explanation }}</p>
+
+        <details>
+            <summary>📋 Raw Jira Data</summary>
+
+            <table class="jira-table">
+                <tr>
+                    <td class="label">Story Points</td>
+                    <td>{{ item.issue.story_points }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Days in Progress</td>
+                    <td>
+                        {{ item.issue.actual_days_in_progress }}
+                        (team avg: {{ item.issue.team_avg_days }})
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">Times Reopened</td>
+                    <td>{{ item.issue.times_reopened }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Comments</td>
+                    <td>{{ item.issue.comments_count }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Status History</td>
+                    <td>
+                        <ul class="status-list">
+                            {% for status, date in item.issue.status_history %}
+                                <li>• <strong>{{ status }}</strong> — {{ date }}</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+        </details>
     </div>
-    
-    <p><strong>Explanation:</strong> {{ analysis.explanation }}</p>
-    
-    <details>
-        <summary>📋 Raw Jira Data (click to expand)</summary>
-        <table style="width:100%; border-collapse: collapse;">
-            {% for key, value in issue.items() %}
-            <tr>
-                <td style="font-weight:bold; padding:6px; border-bottom:1px solid #ddd;">
-                    {{ key.replace('_', ' ').title() }}
-                </td>
-                <td style="padding:6px; border-bottom:1px solid #ddd;">
-                    {{ value }}
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-
-    </details>
+{% endfor %}
 </div>
 
 </body>
