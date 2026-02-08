@@ -1,5 +1,6 @@
 def jira_issues():
     return [
+        # low risk issue
         {
             "issue_key": "PM-215",
             "status_history": [
@@ -14,6 +15,7 @@ def jira_issues():
             "comments_count": 4,
             "times_reopened": 0
         },
+        # high risk issue
         {
             "issue_key": "PM-216",
             "status_history": [

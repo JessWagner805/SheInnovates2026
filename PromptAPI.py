@@ -1,7 +1,7 @@
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import torch
 
-# Load model once
+# load model once
 MODEL_NAME = "google/flan-t5-base"
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_NAME)
@@ -10,6 +10,8 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 model.to(device)
 
 
+
+# calcuate risk score based on data from Jira issue
 def calculate_risk(issue):
     """
     Deterministic risk scoring based on behavioral signals
@@ -44,6 +46,8 @@ def calculate_risk(issue):
     return score, level
 
 
+
+# helper function for prompting the LLM
 def build_explanation_draft(issue):
     """
     Builds a concrete, factual explanation draft with no AI involved
@@ -76,22 +80,24 @@ def build_explanation_draft(issue):
     return " and ".join(parts) + "."
 
 
+
+# feed prompt to LLM and return LLM-generated explanation
 def polish_explanation_with_llm(draft):
     """
     Uses the LLM only to rewrite a known-good draft explanation
     """
     prompt = f"""
-Rewrite the following sentence to sound clear and professional for a Product Manager.
+    Rewrite the following sentence to sound clear and professional for a Product Manager.
 
-Text:
-"{draft}"
+    Text:
+    "{draft}"
 
-Rules:
-- Keep the meaning exactly the same
-- Maximum 2 sentences
-- Do not add new information
-- Do not use the words "risk", "high", "medium", "low", "fake", or "resolved"
-"""
+    Rules:
+    - Keep the meaning exactly the same
+    - Maximum 2 sentences
+    - Do not add new information
+    - Do not use the words "risk", "high", "medium", "low", "fake", or "resolved"
+    """
 
     inputs = tokenizer(
         prompt,
@@ -111,15 +117,11 @@ Rules:
 
     explanation = tokenizer.decode(outputs[0], skip_special_tokens=True).strip()
 
-    # Hard cap to 2 sentences just in case
-    sentences = explanation.split(". ")
-    explanation = ". ".join(sentences[:2]).strip()
-    if not explanation.endswith("."):
-        explanation += "."
-
     return explanation
 
 
+
+# main function to analyze a Jira issue and return risk assessment and LLM-generated explanation
 def analyze_issue(issue):
     score, level = calculate_risk(issue)
     draft = build_explanation_draft(issue)
@@ -127,7 +129,6 @@ def analyze_issue(issue):
     try:
         explanation = polish_explanation_with_llm(draft)
     except Exception:
-        # Absolute safety fallback (still clean and factual)
         explanation = draft
 
     return {
