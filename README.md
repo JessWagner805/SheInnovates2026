@@ -24,22 +24,34 @@ This creates opportunities for “fake progress,” such as:
 * Consistently overestimating or underestimating story points
 * Prolonged time spent In Progress with little forward movement
 
-As a result, PMs often discover problems too late, when deadlines are already missed and recovery options are limited.
+As a result, Product Managers often discover problems too late, when deadlines are already missed and recovery options are limited.
+
 
 ## Solution
+Jira Progress Auditor is an AI-powered tool that analyzes Jira issue activity to detect early warning signs of misleading or low-quality progress.
+
+The program directly addresses the problem by:
+
+* Comparing actual time in progress to team averages to flag tasks that linger without completion
+* Analyzing Jira status histories to detect excessive reopenings, transitions, and stalled work
+* Evaluating engagement with tasks such as comment volume
+* Scoring each issue for fake progress risk (0–100) using an LLM-driven assessment
+* Generating a clear explanation that helps Product Managers understand why an issue is risky
+
+Rather than replacing Jira or changing existing workflows, the system acts as an auditing layer that highlights issues needing attention. Product Managers can quickly identify problematic tasks, investigate earlier, and take corrective action before deadlines are missed.
 
 ## How it works
 **MockJira.py** simulates Jira issue data. **app.py** retrieves this data and sends each issue to **PromptAPI.py**, which uses the FLAN-T5 Base LLM to analyze the issue and compute a fake-progress risk score. **app.py** then combines the raw issue data with the analysis results and serves them to **index.html**, which formats and displays the information on a local web page at [http://localhost:5000/](http://localhost:5000/) when the server is running.
 
+
 ## Outcome
+Product managers gain:
+* Early visibility into delivery risk
+* Data-driven insights instead of blind trust
+* More accurate timelines and forecasts
+* Reduced last-minute surprises and deadline failures
+
 
 ## Video Demonstration
 
 ## Devpost Submission
-
-
-
-
-##Things you will need to install for this to work
-pip install transformers torch flask python-dotenv
-pip install -U sentence-transformers      
