@@ -2,7 +2,7 @@ from flask import Flask, render_template
 from MockJira import jira_issues
 from PromptAPI import analyze_issue
 
-app = Flask(__name__)   # ← MUST be before @app.route
+app = Flask(__name__)
 
 
 @app.route("/")

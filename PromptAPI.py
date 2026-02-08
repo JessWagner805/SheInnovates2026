@@ -1,90 +1,138 @@
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
-import json
 import torch
 
-# Load model once (globally, so it doesn't reload on every request)
+# Load model once
 MODEL_NAME = "google/flan-t5-base"
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_NAME)
 
-# Use GPU if available for faster inference
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model.to(device)
 
 
-def analyze_issue(issue):
-    
-    prompt = f"""Analyze this Jira issue for fake progress patterns.
+def calculate_risk(issue):
+    """
+    Deterministic risk scoring based on behavioral signals
+    """
+    score = 0
 
-Issue Data:
-- Issue Key: {issue['issue_key']}
-- Status Changes: {len(issue['status_history'])} transitions
-- Story Points: {issue['story_points']}
-- Days in Progress: {issue['actual_days_in_progress']} (team avg: {issue['team_avg_days']})
-- Times Reopened: {issue['times_reopened']}
-- Comments: {issue['comments_count']}
+    # Reopenings are strong indicators
+    if issue["times_reopened"] > 0:
+        score += min(issue["times_reopened"] * 15, 30)
 
-Status History: {issue['status_history']}
+    # Time in progress vs team average
+    if issue["actual_days_in_progress"] > issue["team_avg_days"] * 1.5:
+        score += 40
 
-Based on this data, is there fake progress? Provide:
-1. Risk assessment (high/low)
-2. Risk score (0-100)
-3. Brief explanation
+    # Excessive status churn
+    if len(issue["status_history"]) > 5:
+        score += 20
 
-Answer in JSON format with keys: fake_progress (boolean), risk_score (number), explanation (string)
+    # High comment volume suggests friction
+    if issue["comments_count"] > 10:
+        score += 10
+
+    score = min(score, 100)
+
+    if score >= 70:
+        level = "High"
+    elif score >= 40:
+        level = "Medium"
+    else:
+        level = "Low"
+
+    return score, level
+
+
+def build_explanation_draft(issue):
+    """
+    Builds a concrete, factual explanation draft with no AI involved
+    """
+    parts = []
+
+    if issue["actual_days_in_progress"] > issue["team_avg_days"]:
+        parts.append(
+            f"the issue spent {issue['actual_days_in_progress']} days in progress "
+            f"compared to a team average of {issue['team_avg_days']}"
+        )
+
+    if issue["times_reopened"] > 0:
+        parts.append(f"it was reopened {issue['times_reopened']} times")
+
+    if len(issue["status_history"]) > 5:
+        parts.append(
+            f"it experienced {len(issue['status_history'])} status transitions"
+        )
+
+    if issue["comments_count"] > 10:
+        parts.append(f"it accumulated {issue['comments_count']} comments")
+
+    if not parts:
+        return (
+            f"The issue spent {issue['actual_days_in_progress']} days in progress "
+            f"with no reopenings or excessive status changes."
+        )
+
+    return " and ".join(parts) + "."
+
+
+def polish_explanation_with_llm(draft):
+    """
+    Uses the LLM only to rewrite a known-good draft explanation
+    """
+    prompt = f"""
+Rewrite the following sentence to sound clear and professional for a Product Manager.
+
+Text:
+"{draft}"
+
+Rules:
+- Keep the meaning exactly the same
+- Maximum 2 sentences
+- Do not add new information
+- Do not use the words "risk", "high", "medium", "low", "fake", or "resolved"
 """
 
-    # Tokenize and generate
-    inputs = tokenizer(prompt, return_tensors="pt", max_length=512, truncation=True).to(device)
-    
+    inputs = tokenizer(
+        prompt,
+        return_tensors="pt",
+        truncation=True,
+        max_length=512
+    ).to(device)
+
     outputs = model.generate(
         **inputs,
-        max_length=200,
-        num_beams=4,  # Better quality output
+        max_length=60,
+        num_beams=4,
+        no_repeat_ngram_size=4,
+        repetition_penalty=1.4,
         early_stopping=True
     )
-    
-    output_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    
-    print("RAW MODEL RESPONSE:", output_text)  # Debug
 
-    # Try to parse JSON from response
+    explanation = tokenizer.decode(outputs[0], skip_special_tokens=True).strip()
+
+    # Hard cap to 2 sentences just in case
+    sentences = explanation.split(". ")
+    explanation = ". ".join(sentences[:2]).strip()
+    if not explanation.endswith("."):
+        explanation += "."
+
+    return explanation
+
+
+def analyze_issue(issue):
+    score, level = calculate_risk(issue)
+    draft = build_explanation_draft(issue)
+
     try:
-        # FLAN-T5 sometimes adds extra text, try to find JSON
-        if "{" in output_text and "}" in output_text:
-            json_start = output_text.find("{")
-            json_end = output_text.rfind("}") + 1
-            json_str = output_text[json_start:json_end]
-            parsed = json.loads(json_str)
-        else:
-            parsed = json.loads(output_text)
-        
-        # Validate required keys exist
-        if "fake_progress" in parsed and "risk_score" in parsed and "explanation" in parsed:
-            return parsed
-        else:
-            raise ValueError("Missing required keys")
-            
-    except Exception as e:
-        print(f"Parsing error: {e}")
-        
-        # Fallback: create analysis from heuristics if model fails
-        risk_score = 0
-        
-        # Simple heuristic calculation
-        if issue['times_reopened'] > 0:
-            risk_score += 30
-        if issue['actual_days_in_progress'] > issue['team_avg_days'] * 1.5:
-            risk_score += 40
-        if len(issue['status_history']) > 5:
-            risk_score += 20
-        if issue['comments_count'] > 10:
-            risk_score += 10
-            
-        risk_score = min(risk_score, 100)
-        
-        return {
-            "fake_progress": risk_score > 50,
-            "risk_score": risk_score,
-            "explanation": f"Model parsing failed. Heuristic score based on {issue['times_reopened']} reopens and {issue['actual_days_in_progress']}/{issue['team_avg_days']} days ratio."
-        }
+        explanation = polish_explanation_with_llm(draft)
+    except Exception:
+        # Absolute safety fallback (still clean and factual)
+        explanation = draft
+
+    return {
+        "fake_progress": level == "High",
+        "risk_level": level,
+        "risk_score": score,
+        "explanation": explanation
+    }
