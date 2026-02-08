@@ -7,7 +7,7 @@
 - [Solution](#Solution)
 - [How it Works](#How-it-Works)
 - [Outcome](#Outcome)
-- [Video Demonstration](#Video-Demonstration)
+- [Photos](#Photos)
 - [Devpost Submission](#Devpost-Submission)
 
 
