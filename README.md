@@ -19,6 +19,7 @@
 ## Solution
 
 ## How it works
+**MockJira.py** simulates Jira issue data. **app.py** retrieves this data and sends each issue to **PromptAPI.py**, which uses the FLAN-T5 Base LLM to analyze the issue and compute a fake-progress risk score. **app.py** then combines the raw issue data with the analysis results and serves them to **index.html**, which formats and displays the information on a local web page at [http://localhost:5000/](http://localhost:5000/) when the server is running.
 
 ## Outcome
 
