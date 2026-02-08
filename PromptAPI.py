@@ -11,7 +11,7 @@ model.to(device)
 
 
 
-# calcuate risk score based on data from Jira issue
+# calculate risk score based on data from Jira issue
 def calculate_risk(issue):
     """
     Deterministic risk scoring based on behavioral signals
